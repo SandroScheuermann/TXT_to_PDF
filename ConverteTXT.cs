@@ -1,10 +1,7 @@
-﻿using iText.IO.Font.Constants;
-using iText.Kernel.Font;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Draw;
+﻿using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
-using iText.Layout.Properties;
+using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Linq;
 
@@ -12,6 +9,7 @@ namespace TXT_to_PDF
 {
     class ConverteTXT
     {
+        public static ILogger<Worker> Logger = Worker.Logger;
         public static void Converter(FileStream arquivo)
         {
             var nomeArquivoCompleto = arquivo.Name.Split('\\').ToList().Last();
@@ -26,7 +24,7 @@ namespace TXT_to_PDF
             string conteudoTXT = arquivoFileStream.ReadToEnd();
 
             pdf.Add(new Paragraph(conteudoTXT));
-
+            Logger.LogInformation("\nArquivo {arquivo} convertido com sucesso\n", arquivo.Name);
             pdf.Close();
 
         }

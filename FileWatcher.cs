@@ -1,24 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace TXT_to_PDF
 {
     public class FileWatcher
     {
-        private static ILogger<Worker> Logger;
+        public static ILogger<Worker> Logger = Worker.Logger;
 
-        public static void Iniciar(ILogger<Worker> _logger)
-        {
-            Logger = _logger;
-            VerificarDiretorios();
-        }
+        private static TimeSpan tempoDecorrido = new TimeSpan();
 
-        private static void VerificarDiretorios()
+        public static FileSystemWatcher Iniciar()
         {
             var watcher = new FileSystemWatcher(JsonConfig.In_TXT);
 
@@ -28,13 +22,24 @@ namespace TXT_to_PDF
 
             watcher.EnableRaisingEvents = true;
 
-            Logger.LogInformation("Verificou o diretório {diretorio}: ", JsonConfig.In_TXT);
-        }
-        private static void OnCreated(object sender, FileSystemEventArgs arquivo)
-        {
-            Logger.LogInformation("OnCreated chamado com arquivo : {arquivo.FullPath}", arquivo.FullPath);
+            Logger.LogInformation("\nVerificou o diretório {diretorio}: \n", JsonConfig.In_TXT);
 
-            Task.Run(() => ConverteTXT.Converter(new FileStream(arquivo.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read)));
+            return watcher;
+        }
+        private static async void OnCreated(object sender, FileSystemEventArgs arquivo)
+        {
+            Logger.LogInformation("\nOnCreated chamado com arquivo : {arquivo.FullPath}\n", arquivo.FullPath);
+
+            Stopwatch sw = Stopwatch.StartNew();
+
+            await Task.Run(() => ConverteTXT.Converter(new FileStream(arquivo.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read)));
+
+            sw.Stop();
+
+            if (sw.Elapsed > tempoDecorrido)
+                tempoDecorrido = sw.Elapsed;
+
+            Console.WriteLine("MAIOR TEMPO DECORRIDO :" + tempoDecorrido.ToString());
         }
     }
 }

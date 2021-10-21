@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,21 +12,22 @@ namespace TXT_to_PDF
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        public static ILogger<Worker> Logger;
+        private readonly FileSystemWatcher Watcher;
 
         public Worker(ILogger<Worker> logger)
         {
-            _logger = logger;
-            FileWatcher.Iniciar(logger);
+            Logger = logger;
+            Watcher = FileWatcher.Iniciar();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                _logger.LogInformation("Threads rodando : {threads}", Process.GetCurrentProcess().Threads.Count);
-                await Task.Delay(3000, stoppingToken);
+                Logger.LogInformation("\nWorker running at: {time}", DateTimeOffset.Now);
+                Logger.LogInformation("Threads rodando : {threads}\n", Process.GetCurrentProcess().Threads.Count);
+                await Task.Delay(5000, stoppingToken);
             }
         }
     }
