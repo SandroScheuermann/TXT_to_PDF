@@ -1,0 +1,11 @@
+﻿{
+  "profiles": {
+    "TXT_to_PDF": {
+      "commandName": "Project",
+      "dotnetRunMessages": "true",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
